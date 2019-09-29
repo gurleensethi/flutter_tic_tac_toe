@@ -1,3 +1,4 @@
 {
-    "editor.fontFamily": "Input Mono, Menlo, Monaco, 'Courier New', monospace"
+    "editor.fontFamily": "Consolas",
+    "editor.fontSize": 16
 }
