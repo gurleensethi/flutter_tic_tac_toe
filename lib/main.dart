@@ -93,8 +93,11 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
-  List<String> _gameData = List.generate(9, (index) => null);
+  List<List<String>> _gameData = [
+    List.generate(9, (index) => null),
+  ];
   bool _isXTurn = true;
+  int _currentStep = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -102,17 +105,32 @@ class _GameState extends State<Game> {
       child: Column(
         children: <Widget>[
           Board(
-            data: _gameData,
+            data: _gameData[_currentStep],
             onTap: _handleTap,
           ),
           Text(_getTurn()),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _gameData.length,
+              itemBuilder: (context, index) {
+                return RaisedButton(
+                  child: Text('Step $index'),
+                  onPressed: () {
+                    setState(() {
+                      _currentStep = index;
+                    });
+                  },
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 
   String _getTurn() {
-    final winner = _calculateWinner(this._gameData);
+    final winner = _calculateWinner(_gameData[_currentStep]);
     if (winner != null) {
       return "Winner is $winner";
     }
@@ -120,12 +138,18 @@ class _GameState extends State<Game> {
   }
 
   void _handleTap(int index) {
-    final winner = _calculateWinner(this._gameData);
-    if (_gameData[index] != null || winner != null) {
+    final squares = _gameData[_currentStep];
+    final winner = _calculateWinner(squares);
+    if (squares[index] != null || winner != null) {
       return null;
     }
-    _gameData[index] = _isXTurn ? "X" : "O";
+
+    final newSqaures = squares.sublist(0);
+    newSqaures[index] = _isXTurn ? "X" : "O";
+
     setState(() {
+      _gameData.replaceRange(_currentStep + 1, _gameData.length, [newSqaures]);
+      _currentStep++;
       _isXTurn = !_isXTurn;
     });
   }
